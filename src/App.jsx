@@ -11,6 +11,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useCart } from './hooks/useCart';
 import { Card } from './components/Card';
 import { CartDrawer } from './components/CartDrawer';
+import { SobrePage } from './components/SobrePage';
 import { PRODUCTS, FILTERS } from './assets/products';
 import './App.css';
 
@@ -29,6 +30,7 @@ export default function App() {
   const [cartOpen, setCartOpen]   = useState(false);
   const [filter, setFilter]       = useState('Todos');
   const [addedIds, setAddedIds]   = useState({});
+  const [page, setPage]           = useState('home'); // 'home' | 'sobre'
 
   const filtered = useMemo(() => {
     if (filter === 'Todos') return PRODUCTS;
@@ -47,18 +49,24 @@ export default function App() {
   // ── Navegação: cada link do menu tem um destino real ──
   const goInicio = useCallback((e) => {
     e?.preventDefault();
+    setPage('home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   const goToProducts = useCallback((novoFiltro) => (e) => {
     e?.preventDefault();
+    setPage('home');
     setFilter(novoFiltro);
-    document.querySelector('.products-section')?.scrollIntoView({ behavior: 'smooth' });
+    // aguarda a home montar (caso viesse da página Sobre) antes de rolar
+    setTimeout(() => {
+      document.querySelector('.products-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 60);
   }, []);
 
   const goSobre = useCallback((e) => {
     e?.preventDefault();
-    document.querySelector('#sobre')?.scrollIntoView({ behavior: 'smooth' });
+    setPage('sobre');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   return (
@@ -78,6 +86,10 @@ export default function App() {
         </button>
       </nav>
 
+      {page === 'sobre' ? (
+        <SobrePage onBack={goInicio} />
+      ) : (
+       <>
       {/* ── HERO ── */}
       <section className="hero">
         <div>
@@ -161,62 +173,8 @@ export default function App() {
         </div>
       </section>
 
-      {/* ── SOBRE — conteúdo real + fundamentação do TCC ── */}
-      <section id="sobre" className="about-section">
-        <div className="about-inner">
-          <p className="about-eyebrow">Sobre o projeto</p>
-          <h2 className="about-title">
-            Uma loja real, construída como <em>estudo de arquitetura</em>
-          </h2>
-          <p className="about-lead">
-            A NEXO Store é o estudo de caso do Trabalho de Conclusão de Curso de
-            Allan Felipe Sales Menezes — MBA USP/ESALQ, 2026:{' '}
-            <strong>Aplicação de Padrões de Projeto no Desenvolvimento Front-end
-            com React</strong>. Cada tela aqui demonstra, na prática, três padrões
-            que reduzem o acoplamento e tornam o código mais fácil de manter,
-            testar e escalar.
-          </p>
-
-          <div className="about-grid">
-            <article className="about-card">
-              <span className="about-icon">🧩</span>
-              <h3>Value Object (DDD)</h3>
-              <p>
-                A classe <code>Price</code> concentra validação, formatação e
-                cálculo de preços. Imutável via <code>Object.freeze()</code> — a
-                interface nunca formata dinheiro, apenas exibe.
-              </p>
-            </article>
-            <article className="about-card">
-              <span className="about-icon">🪝</span>
-              <h3>Custom Hook</h3>
-              <p>
-                O hook <code>useCart</code> isola toda a regra do carrinho. O
-                componente vira um "dumb component", e a mesma lógica atende
-                carrinho e checkout sem duplicação.
-              </p>
-            </article>
-            <article className="about-card">
-              <span className="about-icon">🧱</span>
-              <h3>Composition Pattern</h3>
-              <p>
-                O <code>Card</code> é montado por composição
-                (<code>Card.Root</code>, <code>Card.Price</code>…), eliminando o
-                prop drilling e respeitando o princípio Aberto/Fechado (OCP).
-              </p>
-            </article>
-          </div>
-
-          <a
-            className="about-cta"
-            href="https://github.com/allanfelipe12/meu-ecommerce-arquitetura"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Ver código no GitHub →
-          </a>
-        </div>
-      </section>
+       </>
+      )}
 
       <footer>
         <p>NEXO Store — TCC <span>USP · ESALQ 2026</span> — Allan Felipe Sales Menezes</p>

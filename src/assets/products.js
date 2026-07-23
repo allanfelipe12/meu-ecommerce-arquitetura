@@ -60,4 +60,4 @@ export const PRODUCTS = [
   },
 ];
 
-export const FILTERS = ['Todos', 'Eletrônicos', 'Wearables', 'Moda', 'Acessórios'];
+export const FILTERS = ['Todos', 'Novidades', 'Ofertas', 'Eletrônicos', 'Wearables', 'Moda', 'Acessórios'];

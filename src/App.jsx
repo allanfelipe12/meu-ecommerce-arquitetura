@@ -30,12 +30,12 @@ export default function App() {
   const [filter, setFilter]       = useState('Todos');
   const [addedIds, setAddedIds]   = useState({});
 
-  const filtered = useMemo(() =>
-    filter === 'Todos'
-      ? PRODUCTS
-      : PRODUCTS.filter(p => p.tags.includes(filter)),
-    [filter]
-  );
+  const filtered = useMemo(() => {
+    if (filter === 'Todos') return PRODUCTS;
+    if (filter === 'Novidades') return PRODUCTS.filter(p => p.isNew);
+    if (filter === 'Ofertas') return PRODUCTS.filter(p => p.sale);
+    return PRODUCTS.filter(p => p.tags.includes(filter));
+  }, [filter]);
 
   const handleAdd = useCallback((product) => {
     cart.addItem(product);
@@ -44,16 +44,33 @@ export default function App() {
     showToast(`✓  ${product.name} adicionado ao carrinho`);
   }, [cart]);
 
+  // ── Navegação: cada link do menu tem um destino real ──
+  const goInicio = useCallback((e) => {
+    e?.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const goToProducts = useCallback((novoFiltro) => (e) => {
+    e?.preventDefault();
+    setFilter(novoFiltro);
+    document.querySelector('.products-section')?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  const goSobre = useCallback((e) => {
+    e?.preventDefault();
+    document.querySelector('#sobre')?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
   return (
     <>
       {/* ── NAV ── */}
       <nav>
-        <div className="logo">NEX<span>O</span></div>
+        <a className="logo" href="#" onClick={goInicio}>NEX<span>O</span></a>
         <ul className="nav-links">
-          <li><a href="#">Início</a></li>
-          <li><a href="#">Coleções</a></li>
-          <li><a href="#">Novidades</a></li>
-          <li><a href="#">Sobre</a></li>
+          <li><a href="#" onClick={goInicio}>Início</a></li>
+          <li><a href="#" onClick={goToProducts('Todos')}>Coleções</a></li>
+          <li><a href="#" onClick={goToProducts('Novidades')}>Novidades</a></li>
+          <li><a href="#" onClick={goSobre}>Sobre</a></li>
         </ul>
         <button className="cart-btn" onClick={() => setCartOpen(true)}>
           🛒 Carrinho
@@ -64,21 +81,23 @@ export default function App() {
       {/* ── HERO ── */}
       <section className="hero">
         <div>
-          <p className="hero-eyebrow">Coleção 2026</p>
+          <p className="hero-eyebrow">Nova coleção · 2026</p>
           <h1 className="hero-title">
             Tecnologia que<br /><em>transforma</em><br />seu estilo.
           </h1>
           <p className="hero-sub">
-            Um e-commerce real construído com DDD, Custom Hooks e
-            Composition Patterns — estudo de caso do TCC ESALQ 2026.
+            Eletrônicos, wearables e acessórios selecionados para quem não abre
+            mão de performance e design. Curadoria enxuta, entrega rápida e
+            frete grátis nas compras acima de R$ 299.
           </p>
-          <button
-            className="hero-cta"
-            onClick={() => document.querySelector('.products-section')
-              .scrollIntoView({ behavior: 'smooth' })}
-          >
-            Ver produtos →
-          </button>
+          <div className="hero-actions">
+            <button className="hero-cta" onClick={goToProducts('Todos')}>
+              Ver produtos →
+            </button>
+            <a className="hero-cta-ghost" href="#sobre" onClick={goSobre}>
+              Conhecer o projeto
+            </a>
+          </div>
           <div className="hero-stats">
             <div className="stat-item">
               <div className="stat-num">8+</div>
@@ -139,6 +158,63 @@ export default function App() {
               </div>
             </Card.Root>
           ))}
+        </div>
+      </section>
+
+      {/* ── SOBRE — conteúdo real + fundamentação do TCC ── */}
+      <section id="sobre" className="about-section">
+        <div className="about-inner">
+          <p className="about-eyebrow">Sobre o projeto</p>
+          <h2 className="about-title">
+            Uma loja real, construída como <em>estudo de arquitetura</em>
+          </h2>
+          <p className="about-lead">
+            A NEXO Store é o estudo de caso do Trabalho de Conclusão de Curso de
+            Allan Felipe Sales Menezes — MBA USP/ESALQ, 2026:{' '}
+            <strong>Aplicação de Padrões de Projeto no Desenvolvimento Front-end
+            com React</strong>. Cada tela aqui demonstra, na prática, três padrões
+            que reduzem o acoplamento e tornam o código mais fácil de manter,
+            testar e escalar.
+          </p>
+
+          <div className="about-grid">
+            <article className="about-card">
+              <span className="about-icon">🧩</span>
+              <h3>Value Object (DDD)</h3>
+              <p>
+                A classe <code>Price</code> concentra validação, formatação e
+                cálculo de preços. Imutável via <code>Object.freeze()</code> — a
+                interface nunca formata dinheiro, apenas exibe.
+              </p>
+            </article>
+            <article className="about-card">
+              <span className="about-icon">🪝</span>
+              <h3>Custom Hook</h3>
+              <p>
+                O hook <code>useCart</code> isola toda a regra do carrinho. O
+                componente vira um "dumb component", e a mesma lógica atende
+                carrinho e checkout sem duplicação.
+              </p>
+            </article>
+            <article className="about-card">
+              <span className="about-icon">🧱</span>
+              <h3>Composition Pattern</h3>
+              <p>
+                O <code>Card</code> é montado por composição
+                (<code>Card.Root</code>, <code>Card.Price</code>…), eliminando o
+                prop drilling e respeitando o princípio Aberto/Fechado (OCP).
+              </p>
+            </article>
+          </div>
+
+          <a
+            className="about-cta"
+            href="https://github.com/allanfelipe12/meu-ecommerce-arquitetura"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Ver código no GitHub →
+          </a>
         </div>
       </section>
 

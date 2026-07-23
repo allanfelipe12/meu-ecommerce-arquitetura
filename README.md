@@ -21,7 +21,7 @@ E-commerce completo que demonstra na prática os 3 padrões de projeto estudados
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/allanfelipe12/nexo-ecommerce
+git clone https://github.com/allanfelipe12/meu-ecommerce-arquitetura
 
 # 2. Instale as dependências
 npm install

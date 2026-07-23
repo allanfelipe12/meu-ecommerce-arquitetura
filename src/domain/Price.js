@@ -44,4 +44,13 @@ export class Price {
   isGreaterThan(other) {
     return this.#value > other.rawValue;
   }
+
+  /**
+   * Igualdade por valor — característica central de um Value Object (Evans, 2003).
+   * Dois Price são iguais quando encapsulam o mesmo valor, independente da
+   * referência de objeto (ao contrário de uma Entidade, comparada por identidade).
+   */
+  equals(other) {
+    return other instanceof Price && this.#value === other.rawValue;
+  }
 }
